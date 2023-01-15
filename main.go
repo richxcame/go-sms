@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -14,6 +15,7 @@ import (
 	"github.com/fiorix/go-smpp/smpp/pdu/pdutext"
 	"github.com/fiorix/go-smpp/smpp/pdu/pdutlv"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
 	"github.com/google/uuid"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -33,6 +35,15 @@ type Client struct {
 }
 
 func main() {
+	// connect redis
+	var ctx = context.Background()
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
 	// Connect with smpp server
 	tx := &smpp.Transmitter{
 		Addr:   os.Getenv("SMS_IP") + ":" + os.Getenv("SMS_PORT"),
@@ -40,6 +51,7 @@ func main() {
 		Passwd: os.Getenv("SMS_PASSWORD"),
 	}
 	conn := tx.Bind()
+
 	var status smpp.ConnStatus
 	if status = <-conn; status.Error() != nil {
 		log.Fatalln("Unable to connect, aborting:", status.Error())
@@ -137,6 +149,21 @@ func main() {
 			})
 			return
 		}
+
+		err = rdb.SetEx(ctx, "key", "value", time.Second*15).Err()
+		if err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"id":      "redis_set_error",
+				"message": err.Error(),
+			})
+			return
+		}
+
+		// val, err := rdb.Get(ctx, "key").Result()
+		// if err != nil {
+		// 	panic(err)
+		// }
+		// fmt.Println("key", val)
 
 		c.JSON(201, gin.H{
 			"id":     sm.RespID(),
