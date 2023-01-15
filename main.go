@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/fiorix/go-smpp/smpp"
@@ -21,6 +24,12 @@ type MessageBody struct {
 	To       string `json:"to" binding:"required"`
 	TextType string `json:"text_type"`
 	Text     string `json:"text"`
+	APIKey   string `json:"api_key"`
+}
+
+type Client struct {
+	Name   string `json:"name"`
+	APIKey string `json:"api_key"`
 }
 
 func main() {
@@ -46,7 +55,10 @@ func main() {
 	})
 
 	r.POST("/messages", func(c *gin.Context) {
-		var body MessageBody
+		var (
+			body    MessageBody
+			clients []Client
+		)
 		if err := c.BindJSON(&body); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"id":      "wrong_request_body",
@@ -54,6 +66,30 @@ func main() {
 			})
 			return
 		}
+		// validate api key
+		// 1.Split to get prefix
+		splittedAPIKey := strings.Split(body.APIKey, ".")
+		prefix := splittedAPIKey[0]
+		APIKey := splittedAPIKey[1]
+		fmt.Println(prefix)
+
+		// 2.Read from file of clients
+		clientJSON, _ := os.ReadFile("clients.json")
+		err := json.Unmarshal(clientJSON, &clients)
+		CheckError(err)
+
+		// 3.Find and compare api key
+		for _, v := range clients {
+			if v.Name == prefix {
+				if v.APIKey != APIKey {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"message": "api_key_error",
+					})
+					return
+				}
+			}
+		}
+
 		// ? Validate phone number
 		if body.From == "" {
 			body.From = os.Getenv("SMS_NUMBER")
@@ -103,10 +139,18 @@ func main() {
 		}
 
 		c.JSON(201, gin.H{
-			"id": sm.RespID(),
+			"id":     sm.RespID(),
+			"status": sm.Resp().Header().Status,
+			"otp":    body.Text,
 		})
 	})
 
 	r.Run()
 
+}
+
+func CheckError(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
