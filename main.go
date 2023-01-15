@@ -102,7 +102,7 @@ func main() {
 			}
 		}
 
-		// ? Validate phone number
+		// 4 Validate phone number
 		if body.From == "" {
 			body.From = os.Getenv("SMS_NUMBER")
 		}
@@ -122,7 +122,7 @@ func main() {
 		} else if body.TextType == "UCS2" {
 			text = pdutext.UCS2(body.Text)
 		}
-
+		// 5. Send Message
 		sm, err := tx.Submit(&smpp.ShortMessage{
 			Src:      body.From,
 			Dst:      body.To,
@@ -149,7 +149,7 @@ func main() {
 			})
 			return
 		}
-
+		// 6. Add to redis otp with expiration time
 		err = rdb.SetEx(ctx, "key", "value", time.Second*15).Err()
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, gin.H{
