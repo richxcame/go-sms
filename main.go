@@ -43,6 +43,10 @@ func main() {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
+	s := rdb.Ping(ctx)
+	if s.Err() != nil {
+		log.Fatalln("Unable to connect to redis, aborting:", s.Err().Error())
+	}
 
 	// Connect with smpp server
 	tx := &smpp.Transmitter{
@@ -101,7 +105,7 @@ func main() {
 			}
 		}
 
-		// 4 Validate phone number
+		// // 4 Validate phone number
 		if body.From == "" {
 			body.From = os.Getenv("SMS_NUMBER")
 		}
