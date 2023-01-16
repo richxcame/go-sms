@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -83,7 +83,6 @@ func main() {
 		splittedAPIKey := strings.Split(body.APIKey, ".")
 		prefix := splittedAPIKey[0]
 		APIKey := splittedAPIKey[1]
-		fmt.Println(prefix)
 
 		// 2.Read from file of clients
 		clientJSON, _ := os.ReadFile("clients.json")
@@ -150,7 +149,15 @@ func main() {
 			return
 		}
 		// 6. Add to redis otp with expiration time
-		err = rdb.SetEx(ctx, "key", "value", time.Second*15).Err()
+		redisLifeTime, err := strconv.Atoi(os.Getenv("REDIS_LIFE_TIME"))
+		if err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"id":      "env_error",
+				"message": err.Error(),
+			})
+			return
+		}
+		err = rdb.SetEx(ctx, sm.RespID(), body.Text, time.Minute*time.Duration(redisLifeTime)).Err()
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, gin.H{
 				"id":      "redis_set_error",
@@ -159,16 +166,22 @@ func main() {
 			return
 		}
 
-		// val, err := rdb.Get(ctx, "key").Result()
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// fmt.Println("key", val)
-
 		c.JSON(201, gin.H{
 			"id":     sm.RespID(),
 			"status": sm.Resp().Header().Status,
 			"otp":    body.Text,
+		})
+	})
+
+	r.GET("messages", func(c *gin.Context) {
+		id := c.Query("id")
+		val, err := rdb.Get(ctx, id).Result()
+		if err != nil {
+			panic(err)
+		}
+		c.JSON(200, gin.H{
+			"id":  id,
+			"otp": val,
 		})
 	})
 
