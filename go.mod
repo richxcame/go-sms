@@ -2,11 +2,16 @@ module github.com/richxcame/richsms
 
 go 1.19
 
-require github.com/fiorix/go-smpp v0.0.0-20210403173735-2894b96e70ba
+require (
+	github.com/fiorix/go-smpp v0.0.0-20210403173735-2894b96e70ba
+	github.com/gin-gonic/gin v1.8.2
+	github.com/go-redis/redis/v9 v9.0.0-rc.2
+)
 
 require (
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.8.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
@@ -26,7 +31,6 @@ require (
 )
 
 require (
-	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	golang.org/x/text v0.6.0 // indirect
 )
