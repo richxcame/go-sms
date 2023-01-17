@@ -1,4 +1,4 @@
-module github.com/richxcame/richsms
+module github.com/richxcame/gosms
 
 go 1.19
 

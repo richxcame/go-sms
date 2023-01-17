@@ -1,4 +1,4 @@
-# RICHSMS
+# go-sms
 
 smpp clients' server, which is client of smpp server 🤪
 
