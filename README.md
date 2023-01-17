@@ -1,14 +1,6 @@
 # RICHSMS
 
-💬 smpp clients' server which is client of smpp server 🤪
-
-## TODO
-
-- [ ] Add security
-- [ ] Add database
-- [ ] Add get status route
-- [ ] Add validations
-- [ ] Add documentation
+smpp clients' server, which is client of smpp server 🤪
 
 ## Prerequirements
 
@@ -42,7 +34,7 @@ tx := &smpp.Transmitter{
  }
 ```
 
-### ENV and Clients.json
+### `.env` and `clients.json`
 
 In root there are examples of files change values for your needs
 
@@ -52,63 +44,58 @@ In root there are examples of files change values for your needs
 
 ```bash
 curl -X POST \
-  'HOST:PORT/messages' \
-  --header 'Accept: */*' \
-  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
+  'http://localhost:8080' \
   --header 'Content-Type: application/json' \
   --data-raw '{
-  "to": "phone_number",
-  "text": "otp",
-  "api_key": "prefix.somekey"
-}
-'
+  "to": "+99362235616",
+  "text": "hi from milkaxq",
+  "api_key": "2e313d17-1ff3-490a-a6bf-b10afbffd9d3"
+}'
 ```
 
-|Key|Value|Description|Example|
-| --- | --- | --- | ---|
-|to|phone_number|should be specified phone number with country code started with **+**| +99362235616|
-|text|otp|random generated one time password to send specific phone_number| 12345|
-|api_key| prefix.somekey| raw prefix to find from json file and check key to authenticate client| pc1.wqeij12o3noqwiedas|
+| Key     | Value        | Description                                                            | Example                              |
+| ------- | ------------ | ---------------------------------------------------------------------- | ------------------------------------ |
+| to      | phone number | should be specified phone number with country code started with **+**  | +99362235616                         |
+| text    | message      | your message which your want to send                                   | hi from milkaxq                      |
+| api_key | secret key   | raw prefix to find from json file and check key to authenticate client | 2e313d17-1ff3-490a-a6bf-b10afbffd9d3 |
 
 ### Response Create Message
 
 ```json
 {
-  "id": "15b0c2f2",
-  "otp": "012345",
-  "status": 0
+	"id": "15b0c2f2",
+	"message": "hi from milkaxq"
 }
 ```
 
-|Key|Value|Description|
-| --- | --- | --- |
-|id|15b0c2f2|randomly generated id of smpp provider|
-|otp|012345|message that we sent with request|
-|status| 0| don't understand how our ISP works|
+| Key    | Value    | Description                            |
+| ------ | -------- | -------------------------------------- |
+| id     | 15b0c2f2 | randomly generated id of smpp provider |
+| otp    | 012345   | message that we sent with request      |
+| status | 0        | don't understand how our ISP works     |
 
 ### Request Check Message
 
 ```bash
 curl -X GET \
-  '95.85.108.114:8080/messages?id=15598942' \
+  '95.85.108.114:8080/messages/15b0c2f2' \
   --header 'Accept: */*' \
-  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)'
 ```
 
-|QueryKey|QueryValue|Description|
-| --- | --- | --- |
-|id|15b0c2f2|randomly generated id of smpp provider|
+| Param    | Description                            |
+| -------- | -------------------------------------- |
+| 15b0c2f2 | randomly generated id of smpp provider |
 
 ### Response Check Message
 
 ```json
 {
-  "id": "15b0c2f2",
-  "otp": "012345"
+	"id": "15b0c2f2",
+	"message": "hi from milkaxq"
 }
 ```
 
-|Key|Value|Description|
-| --- | --- | --- |
-|id|15b0c2f2|randomly generated id of smpp provider|
-|otp|012345|message that we sent with request|
+| Key     | Value           | Description                            |
+| ------- | --------------- | -------------------------------------- |
+| id      | 15b0c2f2        | randomly generated id of smpp provider |
+| message | hi from milkaxq | message that we sent with request      |
