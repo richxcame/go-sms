@@ -102,7 +102,7 @@ curl -X GET \
 
 ## Security
 
-Please, create save api*keys. We recommend to use [uuid v4](<https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4*(random)>)
+Please, create safe "api_key"s. We recommend to use [uuid v4](<https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4*(random)>)
 
 ## Contributors
 
