@@ -99,3 +99,12 @@ curl -X GET \
 | ------- | --------------- | -------------------------------------- |
 | id      | 15b0c2f2        | randomly generated id of smpp provider |
 | message | hi from milkaxq | message that we sent with request      |
+
+## Security
+
+Please, create save api*keys. We recommend to use [uuid v4](<https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4*(random)>)
+
+## Contributors
+
+-   @milkaxq
+-   @richxcame
